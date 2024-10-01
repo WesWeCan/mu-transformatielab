@@ -2,6 +2,12 @@
 import { app, ipcMain } from 'electron';
 import { shell } from 'electron';
 
+
+import TranscribeModel from './TranscribeModel';
+
+
+
+
 export const registerInternalProcesses = async () => {
 
     ipcMain.on('openExternal', (event, arg) => {
@@ -16,8 +22,5 @@ export const registerInternalProcesses = async () => {
         const number = Math.floor(Math.random() * 100);
         return number;
     });
-
-
-
 
 }

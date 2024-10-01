@@ -2,8 +2,20 @@
 
 import { onMounted, ref } from 'vue';
 
-onMounted(() => {
+import { pipeline, env } from '@huggingface/transformers';
+env.allowLocalModels = false;
+
+let transcriber;
+
+const loadingModel = ref<boolean>(false);
+
+onMounted(async () => {
     console.log('Recording.vue mounted');
+
+    loadingModel.value = true;
+    transcriber = await pipeline('automatic-speech-recognition', 'Xenova/whisper-small');
+    loadingModel.value = false;
+
 })
 
 const recorder = ref<MediaRecorder | null>(null);
@@ -53,15 +65,72 @@ const stopRecording = async () => {
     }
 
     recordedChunks.value = [];
+
+    transcribe();
 }
+
+const transcribing = ref<boolean>(false);
+const transcribeOutput = ref<string>('');
+
+const transcribe = async () => {
+    transcribing.value = true;
+    transcribeOutput.value = '';
+
+    const url = playback.value.src;
+    const duration = playback.value.duration;
+
+    try {
+        transcribeOutput.value = await transcriber(url, { 
+            language: 'dutch', 
+            task: 'transcribe',
+            chunk_length_s: 30,
+            stride_length_s: 5
+        });
+    } catch (error) {
+        console.error('Error during transcription:', error);
+        transcribeOutput.value = 'Transcription failed.';
+    } finally {
+        transcribing.value = false;
+    }
+
+    console.log('transcribe', transcribeOutput.value);
+}
+
+
+
+
+
 
 </script>
 
 <template>
+
+
+
     <div>Recording</div>
+
+    <template v-if="loadingModel">
+        <div>Loading Model...</div>
+    </template>
     
+<template v-else>
     <button @click="startRecording" :disabled="isRecording">Start Recording</button>
     <button @click="stopRecording" :disabled="!isRecording">Stop Recording</button>
 
     <audio ref="playback" controls></audio>
+
+
+    <div>Recorded Chunks: {{ recordedChunks.length }}</div>
+
+    <div v-if="transcribing">
+        <div>Transcribing...</div>
+    </div>
+
+    <div v-else>
+        {{ transcribeOutput }}
+    </div>
+
+</template>
+
+
 </template>

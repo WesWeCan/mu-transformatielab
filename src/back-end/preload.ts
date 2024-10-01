@@ -13,6 +13,7 @@ declare global {
       getRandomNumber: () => Promise<number>;
       onUpdateMenuCounter: (callback: (value: number) => void) => void;
       counterMenuValue: (value: number) => void;
+      transcribe: (file: string, options: any) => Promise<string>;
     };
   }
 }
@@ -34,7 +35,9 @@ contextBridge.exposeInMainWorld('electronAPI', {
 
     counterMenuValue: (value : number) => {
         ipcRenderer.send('update-counter', value);
-    }
+    },
     
-  
+
+
+
 });
