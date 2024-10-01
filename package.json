@@ -40,7 +40,10 @@
   "license": "MIT",
   "dependencies": {
     "@huggingface/transformers": "^3.0.0-alpha.19",
+    "@types/d3": "^7.4.3",
     "axios": "^1.7.7",
+    "d3": "^7.9.0",
+    "d3-cloud": "^1.2.7",
     "electron-squirrel-startup": "^1.0.1",
     "vue": "^3.4.35",
     "vue-router": "^4.4.2"

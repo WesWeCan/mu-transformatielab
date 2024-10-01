@@ -2,6 +2,7 @@ import { createRouter, createWebHashHistory } from "vue-router";
 
 import Home from "../views/Home.vue";
 import Testimonial from "../views/Testimonial.vue";
+import Wordcloud from "../views/Wordcloud.vue";
 
 const routes = [
   {
@@ -13,6 +14,11 @@ const routes = [
     path: "/testimonial",
     name: "testimonial",
     component: Testimonial,
+  },
+  {
+    path: "/wordcloud",
+    name: "wordcloud",
+    component: Wordcloud,
   }
 
 ];
