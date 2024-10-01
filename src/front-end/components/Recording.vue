@@ -7,13 +7,24 @@ env.allowLocalModels = false;
 
 let transcriber;
 
+const isEnglish = ref<boolean>(false);
+
 const loadingModel = ref<boolean>(false);
+
+const selectedWords = ref<string[]>([]);
+const availableWords = ref<string[]>([]);
 
 onMounted(async () => {
     console.log('Recording.vue mounted');
 
     loadingModel.value = true;
-    transcriber = await pipeline('automatic-speech-recognition', 'Xenova/whisper-small');
+    transcriber = await pipeline('automatic-speech-recognition', 'Xenova/whisper-base', {
+        dtype: {
+            encoder_model: 'fp32',
+            decoder_model_merged: 'fp32',
+        },
+        device: 'webgpu'
+    });
     loadingModel.value = false;
 
 })
@@ -79,9 +90,11 @@ const transcribe = async () => {
     const url = playback.value.src;
     const duration = playback.value.duration;
 
+    const start = performance.now();
+
     try {
-        transcribeOutput.value = await transcriber(url, { 
-            language: 'dutch', 
+        transcribeOutput.value = await transcriber(url, {
+            language: isEnglish.value ? 'english' : 'dutch',
             task: 'transcribe',
             chunk_length_s: 30,
             stride_length_s: 5
@@ -93,11 +106,43 @@ const transcribe = async () => {
         transcribing.value = false;
     }
 
-    console.log('transcribe', transcribeOutput.value);
+
+    const end = performance.now();
+
+    console.log('transcribe', transcribeOutput.value.text);
+
+    console.log('completed in', end - start, 'ms');
+    availableWords.value = transcribeOutput.value.text.trim().split(' ');
+
+    // from each word remove all reading signs like , . ! etc
+    // also make each word lowercase
+
+    for (let i = 0; i < availableWords.value.length; i++) {
+        const word = availableWords.value[i];
+        availableWords.value[i] = word.replace(/[.,!?]/g, '').toLowerCase();
+    }
+
+
 }
 
 
+const toggleWordSelection = (word: string) => {
+    if (selectedWords.value.includes(word)) {
+        selectedWords.value = selectedWords.value.filter((selectedWord) => selectedWord !== word);
+    } else {
+        selectedWords.value.push(word);
+    }
+}
 
+const newWord = ref<string>('');
+const addCustomWord = () => {
+    if (newWord.value.trim().length === 0) {
+        return;
+    }
+
+    toggleWordSelection(newWord.value);
+    newWord.value = '';
+}
 
 
 
@@ -109,28 +154,51 @@ const transcribe = async () => {
 
     <div>Recording</div>
 
+    <div class="language">
+        <button @click="isEnglish = true" :disabled="isEnglish">English</button>
+        <button @click="isEnglish = false" :disabled="!isEnglish">Dutch</button>
+    </div>
+
     <template v-if="loadingModel">
         <div>Loading Model...</div>
     </template>
-    
-<template v-else>
-    <button @click="startRecording" :disabled="isRecording">Start Recording</button>
-    <button @click="stopRecording" :disabled="!isRecording">Stop Recording</button>
 
-    <audio ref="playback" controls></audio>
+    <template v-else>
+        <button @click="startRecording" :disabled="isRecording">Start Recording</button>
+        <button @click="stopRecording" :disabled="!isRecording">Stop Recording</button>
+
+        <audio ref="playback" controls hidden></audio>
+
+        <div v-if="transcribing">
+            <div>Transcribing...</div>
+        </div>
+
+        <div v-else>
+            {{ transcribeOutput }}
+        </div>
 
 
-    <div>Recorded Chunks: {{ recordedChunks.length }}</div>
 
-    <div v-if="transcribing">
-        <div>Transcribing...</div>
-    </div>
+        <template v-if="availableWords.length">
+            <div class="words">
+                <button v-for="word in availableWords" :key="word" @click="toggleWordSelection(word)">
+                    <span v-if="selectedWords.includes(word)" style="font-weight: bold">{{ word }}</span>
+                    <span v-else>{{ word }}</span>
+                </button>
 
-    <div v-else>
-        {{ transcribeOutput }}
-    </div>
+                <br><br>
+                <span>Add Word</span>
+                <input type="text" v-model="newWord" @keyup.enter="addCustomWord" />
+            </div>
 
-</template>
+            <div class="selected-words">
+                <button v-for="word in selectedWords" :key="word" @click="toggleWordSelection(word)">
+                    <span style="font-weight: bold">{{ word }}</span>
+                </button>
+            </div>
+        </template>
+
+    </template>
 
 
 </template>
