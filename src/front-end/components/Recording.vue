@@ -151,7 +151,7 @@ const addCustomWord = () => {
 <template>
 
 
-
+<h1>Record your testimonial</h1>
     <div>Recording</div>
 
     <div class="language">
@@ -164,7 +164,7 @@ const addCustomWord = () => {
     </template>
 
     <template v-else>
-        <button @click="startRecording" :disabled="isRecording">Start Recording</button>
+        <button @click="startRecording" :disabled="isRecording">Start Recording in {{ isEnglish ? 'English' : 'Dutch' }}</button>
         <button @click="stopRecording" :disabled="!isRecording">Stop Recording</button>
 
         <audio ref="playback" controls hidden></audio>
@@ -176,8 +176,6 @@ const addCustomWord = () => {
         <div v-else>
             {{ transcribeOutput }}
         </div>
-
-
 
         <template v-if="availableWords.length">
             <div class="words">

@@ -1,5 +1,12 @@
 @import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&display=swap');
 
+@font-face {
+    font-family: 'CriteriaCF';
+    src: url('./fonts/CriteriaCF-Bold.otf') format('opentype');
+    font-weight: bold;
+}
+
+
 body {
     // font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica,
     //   Arial, sans-serif;
@@ -11,6 +18,8 @@ body {
     &#cloud {
         max-width: unset;
         padding: unset;
+
+        background-color: #FFD3E3;
     }
 }
 
@@ -26,4 +35,91 @@ body {
   height: 100vh;
   overflow: hidden;
   
+}
+
+
+.scanning {
+  position: relative;
+
+  width: 100%;
+  height: 600px;
+}
+
+
+.div-process {
+  position: fixed;
+  top: 0;
+  left: 0;
+
+  z-index: 999;
+
+  opacity: 0;
+  pointer-events: none;
+}
+
+.div-render {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  // background-color: blanchedalmond;
+
+  .loading {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      z-index: -999;
+      background-color: #f0f0f057;
+      padding: 1rem;
+      border-radius: 0.5rem;    
+
+      @keyframes spin {
+          0% { transform: translate(-50%, 75%) rotate(0deg); }
+          100% { transform: translate(-50%, 75%) rotate(-360deg); }
+      }
+
+
+      .loading-text {
+          font-size: 1.5rem;
+          font-weight: bold;
+      }
+  }
+}
+
+video {
+  display: none!important;
+  position: fixed;
+  bottom: 0;
+  right: 0;
+  z-index: -999;
+  transform-origin: bottom right;
+  // transform: scale(0.5);
+
+  
+}
+
+@keyframes growAndShrink {
+  0% {
+      scale: 1;
+      opacity: 0;
+  }
+  50% {
+      scale: 1.1;
+      opacity: 1;
+  }
+  100% {
+      scale: 1;
+      opacity: 0;
+  }
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+#text {
+  opacity: 0;
+  // transform-origin: center;
+  animation: growAndShrink 25s ease-in-out infinite;
 }

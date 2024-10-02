@@ -3,12 +3,19 @@ import { onMounted, ref } from 'vue';
 
 import Recording from '../components/Recording.vue';
 
+import Scanning from '../components/Scanning.vue';
+
 </script>
 
 <template>
 
 
-    <h1>Record your testimonial</h1>
+    <Scanning></Scanning>
+
+
+
+  
+
 
     <Recording></Recording>
 

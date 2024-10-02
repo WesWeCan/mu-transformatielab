@@ -10,27 +10,49 @@ import { text, stopwords } from '../assets/data';
 const wordcloud = ref<HTMLElement | null>(null);
 let wordcloudInitialized = false;
 
+const colors = [
+    "#F05627",
+    "#E5F4E0",
+    "#38001E"
+]
+
+
 onMounted(() => {
     document.body.id = 'cloud';
     
-    const processWords = (text) => {
-        const wordCount = text.split(/[\s.]+/g)
-            .map(w => w.replace(/^[“‘"\-—()\[\]{}]+/g, ""))
-            .map(w => w.replace(/[;:.!?()\[\]{},"'’”\-—]+$/g, ""))
-            .map(w => w.replace(/['’]s$/g, ""))
-            .map(w => w.substring(0, 30))
-            .map(w => w.toLowerCase())
-            .filter(w => w && !stopwords.has(w))
-            .reduce((acc, w) => {
-                acc[w] = (acc[w] || 0) + 1;
-                return acc;
-            }, {});
+const processWords = (text) => {
+    const maxWords = 100;
 
-        return Object.keys(wordCount).map(d => ({
-            text: d,
-            size: Math.min(50, wordCount[d]) * 1
-        }));
-    };
+    const wordCount = text.split(/[\s.]+/g)
+        .map(w => w.replace(/^[“‘"\-—()\[\]{}]+/g, ""))
+        .map(w => w.replace(/[;:.!?()\[\]{},"'’”\-—]+$/g, ""))
+        .map(w => w.replace(/['’]s$/g, ""))
+        .map(w => w.substring(0, 30))
+        .map(w => w.toLowerCase())
+        .filter(w => w && !stopwords.has(w))
+        .reduce((acc, w) => {
+            acc[w] = (acc[w] || 0) + 1;
+            return acc;
+        }, {});
+
+    let wordsArray = Object.keys(wordCount).map(d => ({
+        text: d,
+        size: Math.min(50, wordCount[d]) * 1,
+        color: colors[Math.floor(Math.random() * colors.length)]
+    }));
+
+    wordsArray = wordsArray.sort((a, b) => b.size - a.size).slice(0, maxWords);
+
+    const wordsUsedOnce = wordsArray.filter(word => word.size === 1);
+    const otherWords = wordsArray.filter(word => word.size > 1);
+
+    for (let i = wordsUsedOnce.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [wordsUsedOnce[i], wordsUsedOnce[j]] = [wordsUsedOnce[j], wordsUsedOnce[i]];
+    }
+
+    return otherWords.concat(wordsUsedOnce);
+};
 
     const words = processWords(text);
 
@@ -44,7 +66,7 @@ onMounted(() => {
                     height: window.innerHeight,
                     size: d => d.size,
                     rotate: () => 0,
-                    fill: 'black'
+                    fill: 'black',
                 });
                 wordcloud.value.append(theWordcloud);
                 wordcloudInitialized = true;
@@ -72,10 +94,10 @@ function WordCloud(text: { text: string, size: number }[], {
     width = 0,
     height = 0,
     maxWords = -1,
-    fontFamily = "DM Sans",
+    fontFamily = "CriteriaCF",
     fontScale = 15,
     fill = 'black',
-    padding = 1,
+    padding = 2,
     rotate = 0,
     invalidation
 } = {}) {
@@ -99,16 +121,19 @@ function WordCloud(text: { text: string, size: number }[], {
         .font(fontFamily)
         .fontSize(d => Math.sqrt(d.size) * fontScale)
         .on("word", ({size, x, y, rotate, text}) => {
-            g.append("text")
+            const textGroup = g.append("g");
+            textGroup.append("text")
                 .datum({text, size})
+                .attr("id", "text")
                 .attr("font-size", size)
-                .attr("fill", fill)
+                .attr("fill", () => colors[Math.floor(Math.random() * colors.length)])
                 .attr("transform", `translate(${x},${y}) rotate(${rotate})`)
+                .attr("style", `animation-delay: ${Math.random() * 10}s`)
                 .text(text);
         });
 
     cloud.start();
-    invalidation && invalidation.then(() => cloud.stop());
+    // invalidation && invalidation.then(() => cloud.stop());
     return svg.node();
 }
 </script>
