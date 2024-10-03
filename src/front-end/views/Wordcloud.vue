@@ -2,35 +2,51 @@
 import { onMounted, ref } from 'vue';
 
 import * as d3 from "d3";
+
+// @ts-ignore
 import d3Cloud from "d3-cloud";
 
 import { text, stopwords } from '../assets/data';
 
-
 const wordcloud = ref<HTMLElement | null>(null);
 let wordcloudInitialized = false;
 
+
+
+const DENColor = {
+    pleasantlyPink: "#BF8097",
+    outstandingOrange: "#9A2400",
+    maturedMaroon: "#38001E",
+    progressivePistachio: "#6E7D68",
+    black: "#0D0D0D",
+    white: "#FFFFFF",
+    success: "#2EC786",
+    error: "#FF3B53"
+};
+
 const colors = [
-    "#F05627",
-    "#E5F4E0",
-    "#38001E"
+    DENColor.progressivePistachio,
+    DENColor.maturedMaroon,
+    DENColor.black,
+    DENColor.white
 ]
 
 
 onMounted(() => {
     document.body.id = 'cloud';
     
-const processWords = (text) => {
+const processWords = (text : string) => {
     const maxWords = 100;
 
-    const wordCount = text.split(/[\s.]+/g)
+    const wordCount = 
+        text.split(/[\s.]+/g)
         .map(w => w.replace(/^[“‘"\-—()\[\]{}]+/g, ""))
         .map(w => w.replace(/[;:.!?()\[\]{},"'’”\-—]+$/g, ""))
         .map(w => w.replace(/['’]s$/g, ""))
         .map(w => w.substring(0, 30))
         .map(w => w.toLowerCase())
         .filter(w => w && !stopwords.has(w))
-        .reduce((acc, w) => {
+        .reduce((acc : any, w : string) => {
             acc[w] = (acc[w] || 0) + 1;
             return acc;
         }, {});
@@ -65,7 +81,7 @@ const processWords = (text) => {
                     width: window.innerWidth,
                     height: window.innerHeight,
                     size: d => d.size,
-                    rotate: () => 0,
+                    rotate: () => { return 0; },
                     fill: 'black',
                 });
                 wordcloud.value.append(theWordcloud);
@@ -84,23 +100,46 @@ const processWords = (text) => {
     updateWordcloudSize();
 });
 
-function WordCloud(text: { text: string, size: number }[], {
-    size = d => d.size,
-    word = d => d.text,
-    marginTop = 10,
-    marginRight = 10,
-    marginBottom = 10,
-    marginLeft = 10,
-    width = 0,
-    height = 0,
-    maxWords = -1,
-    fontFamily = "CriteriaCF",
-    fontScale = 15,
-    fill = 'black',
-    padding = 2,
-    rotate = 0,
-    invalidation
-} = {}) {
+
+interface WordCloudOptions {
+    size?: (d: any) => number;
+    word?: (d: any) => string;
+    marginTop?: number;
+    marginRight?: number;
+    marginBottom?: number;
+    marginLeft?: number;
+    width?: number;
+    height?: number;
+    maxWords?: number;
+    fontFamily?: string;
+    fontScale?: number;
+    fill?: string;
+    padding?: number;
+    rotate?: (d: any) => number | number;
+    invalidation?: any;
+}
+
+function WordCloud(text: { text: string, size: number }[], options: WordCloudOptions = {}) {
+    
+    const {
+        size = (d: any) => d.size,
+        word = (d: any) => d.text,
+        marginTop = 10,
+        marginRight = 10,
+        marginBottom = 10,
+        marginLeft = 10,
+        width = 0,
+        height = 0,
+        maxWords = -1,
+        fontFamily = "CriteriaCF",
+        fontScale = 15,
+        fill = 'black',
+        padding = 2,
+        rotate = 0,
+        invalidation
+    } = options;
+    
+    // the rest of your function
     const words = text;
 
     const svg = d3.create("svg")
@@ -119,21 +158,21 @@ function WordCloud(text: { text: string, size: number }[], {
         .padding(padding)
         .rotate(rotate)
         .font(fontFamily)
-        .fontSize(d => Math.sqrt(d.size) * fontScale)
-        .on("word", ({size, x, y, rotate, text}) => {
+        .fontSize((d: { size: number; }) => Math.sqrt(d.size) * fontScale)
+        .on("word", (word: {size: number; x: number; y: number; rotate: number; text: string}) => {
             const textGroup = g.append("g");
             textGroup.append("text")
-                .datum({text, size})
+                .datum({text: word.text, size: word.size})
                 .attr("id", "text")
-                .attr("font-size", size)
+                .attr("font-size", word.size)
                 .attr("fill", () => colors[Math.floor(Math.random() * colors.length)])
-                .attr("transform", `translate(${x},${y}) rotate(${rotate})`)
+                .attr("transform", `translate(${word.x},${word.y}) rotate(${word.rotate})`)
                 .attr("style", `animation-delay: ${Math.random() * 10}s`)
-                .text(text);
+                .text(word.text);
         });
 
     cloud.start();
-    // invalidation && invalidation.then(() => cloud.stop());
+    invalidation && invalidation.then(() => cloud.stop());
     return svg.node();
 }
 </script>

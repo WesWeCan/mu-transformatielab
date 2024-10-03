@@ -7,6 +7,15 @@
 }
 
 
+$pleasantly-pink: #BF8097;
+$outstanding-orange: #9A2400;
+$matured-maroon: #38001E;
+$progressive-pistachio: #6E7D68;
+$black: #0D0D0D;
+$white: #FFFFFF;
+$success: #2EC786;
+$error: #FF3B53;
+
 body {
     // font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica,
     //   Arial, sans-serif;
@@ -19,9 +28,16 @@ body {
         max-width: unset;
         padding: unset;
 
-        background-color: #FFD3E3;
+        background-color: #9A2400;
     }
 }
+h1 {
+    font-size: 2rem;
+    margin-bottom: 1rem;
+    text-align: center;
+    font-family: 'CriteriaCF';
+}
+
 
 #app {
   display: flex;
