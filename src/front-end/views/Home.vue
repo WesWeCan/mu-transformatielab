@@ -8,7 +8,16 @@ import { onMounted } from 'vue';
 
 onMounted(() => {
     // router.push('/testimonial');
-    router.push('/wordcloud');
+    // router.push('/wordcloud');
+
+
+    window.electronAPI.onBecomeMain(() => {
+        router.push('/testimonial');
+    });
+
+    window.electronAPI.onBecomeCloud(() => {
+        router.push('/wordcloud');
+    });
 });
 
 </script>

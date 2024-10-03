@@ -36,6 +36,8 @@ const finish = () => {
     setTimeout(() => {
         currentStep.value = 0;
         currentUuid.value = '<UNSET>';
+
+        window.electronAPI.updateCloud();
     }, 5000);
 }
 

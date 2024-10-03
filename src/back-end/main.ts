@@ -28,21 +28,68 @@ const createWindow = () => {
     },
   });
 
+  const cloudWindow = new BrowserWindow({
+    width: 900,
+    height: 600,
+    webPreferences: {
+      preload: path.join(__dirname, 'preload.js'),
+    },
+  });
+
 
   buildMenu(mainWindow);
+  buildMenu(cloudWindow);
 
 
   // and load the index.html of the app.
   if (MAIN_WINDOW_VITE_DEV_SERVER_URL) {
     mainWindow.loadURL(MAIN_WINDOW_VITE_DEV_SERVER_URL);
+    cloudWindow.loadURL(MAIN_WINDOW_VITE_DEV_SERVER_URL);
 
     // Open the DevTools.
-    mainWindow.webContents.openDevTools();
+    // mainWindow.webContents.openDevTools();
+    // cloudWindow.webContents.openDevTools();
 
-    openInternalStorageFolder();
+    // openInternalStorageFolder();
   } else {
     mainWindow.loadFile(path.join(__dirname, `../renderer/${MAIN_WINDOW_VITE_NAME}/index.html`));
+    cloudWindow.loadFile(path.join(__dirname, `../renderer/${MAIN_WINDOW_VITE_NAME}/index.html`));
   }
+
+
+  mainWindow.webContents.on('did-finish-load', () => {
+    mainWindow.webContents.send('become-main');
+  });
+
+  cloudWindow.webContents.on('did-finish-load', async () => {
+  cloudWindow.webContents.send('become-cloud');
+  });
+
+
+   // Check for available displays
+   const { screen } = require('electron');
+   const displays = screen.getAllDisplays();
+ 
+   if (displays.length > 1) {
+
+    const firstDisplay = displays[0];
+    mainWindow.setBounds(firstDisplay.bounds);
+
+     // Move the window to the second display
+     const secondDisplay = displays[1];
+     cloudWindow.setBounds(secondDisplay.bounds);
+   }
+ 
+   setTimeout(() => {
+
+    mainWindow.setFullScreen(true);
+    mainWindow.maximize();
+ 
+     cloudWindow.setFullScreen(true);
+   cloudWindow.maximize();
+     
+   }, 1000);
+   // Enter fullscreen mode (green dot)
 
 };
 

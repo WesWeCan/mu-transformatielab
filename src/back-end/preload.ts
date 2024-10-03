@@ -20,6 +20,10 @@ declare global {
       storeTranscribed: (transcription: string, uuid: string) => void;
       storeWords: (words: string[], uuid: string) => void;
       getWords: () => Promise<string[]>;
+      onBecomeMain: (callback: () => void) => void;
+      onBecomeCloud: (callback: () => void) => void;
+      onUpdateCloud: (callback: () => void) => void;
+      updateCloud: () => void;
     };
   }
 }
@@ -43,6 +47,30 @@ contextBridge.exposeInMainWorld('electronAPI', {
         ipcRenderer.send('update-counter', value);
     },
     
+
+    onBecomeMain: (callback : () => void) => {
+      ipcRenderer.on('become-main', (event) => {
+          callback();
+      });
+    },
+
+    onBecomeCloud: (callback : () => void) => {
+      ipcRenderer.on('become-cloud', (event) => {
+          callback();
+      });
+    },
+
+
+    onUpdateCloud: (callback : () => void) => {
+      ipcRenderer.on('update-cloud', (event) => {
+          callback();
+      });
+    },
+
+    updateCloud : () => {
+        ipcRenderer.invoke('update-cloud');
+    },
+
 
 
     storeTicket : (ticketBase64 : string, uuid : string) => {

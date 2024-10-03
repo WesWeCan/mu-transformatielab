@@ -3,7 +3,7 @@ import { app, Menu } from 'electron';
 
 const isMac = process.platform === 'darwin'
 
-
+import { openInternalStorageFolder } from '../internal-processes/internal-storage';
 
 
 export const buildMenu = (renderWindow: Electron.BrowserWindow) => {
@@ -28,7 +28,14 @@ export const buildMenu = (renderWindow: Electron.BrowserWindow) => {
         {
             label: 'File',
             submenu: [
-                isMac ? { role: 'close' } : { role: 'quit' }
+                {
+                    label: 'Open Testimonials Folder',
+                    click: async () => {
+                        await openInternalStorageFolder();
+                    }
+                },
+                isMac ? { role: 'close' } : { role: 'quit' },
+
             ]
         },
         {
@@ -61,19 +68,19 @@ export const buildMenu = (renderWindow: Electron.BrowserWindow) => {
                     ])
             ]
         },
-        {
-            label: "Interact with Counter",
-            submenu: [
-                {
-                    click: () => renderWindow.webContents.send('update-counter', 1),
-                    label: 'Increment'
-                },
-                {
-                    click: () => renderWindow.webContents.send('update-counter', -1),
-                    label: 'Decrement'
-                }
-            ]
-        },
+        // {
+        //     label: "Interact with Counter",
+        //     submenu: [
+        //         {
+        //             click: () => renderWindow.webContents.send('update-counter', 1),
+        //             label: 'Increment'
+        //         },
+        //         {
+        //             click: () => renderWindow.webContents.send('update-counter', -1),
+        //             label: 'Decrement'
+        //         }
+        //     ]
+        // },
         {
             label: 'View',
             submenu: [

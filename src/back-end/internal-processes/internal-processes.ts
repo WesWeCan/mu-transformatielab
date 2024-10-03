@@ -1,5 +1,5 @@
 
-import { app, ipcMain } from 'electron';
+import { app, ipcMain, BrowserWindow } from 'electron';
 import { shell } from 'electron';
 
 import { storeTicketImg, storeTranscribe, storeTranscribed, storeWords, getWords } from './internal-storage';
@@ -60,6 +60,15 @@ export const registerInternalProcesses = async () => {
         const words = await getWords();
 
         return words;
+    });
+
+
+    ipcMain.handle('update-cloud', async (event) => {
+
+        BrowserWindow.getAllWindows().forEach(window => {
+            window.webContents.send('update-cloud');
+        });
+
     });
 
 }

@@ -32,14 +32,49 @@ const colors = [
 ]
 
 
+let resizeListener : any;
+
 onMounted(async () => {
     document.body.id = 'cloud';
     
+
+    window.electronAPI.onUpdateCloud(() => {
+        initCloud();
+    });
+
+    initCloud();
+
+});
+
+
+const initCloud = async () => {
+
+    // empty the cloud
+    wordcloudInitialized = false;
+    wordcloud.value.innerHTML = '';
+
 
     let storedWords = await window.electronAPI.getWords();
     // shuffle
     storedWords = storedWords.sort(() => Math.random() - 0.5);
     console.log(storedWords);
+
+
+
+    const words = processWords(storedWords);
+
+    console.log(words.length);
+
+    // reset the listener
+    if (resizeListener) {
+        window.removeEventListener('resize', resizeListener);
+    }
+
+    resizeListener = window.addEventListener('resize', updateWordcloudSize);
+    updateWordcloudSize(words);
+
+}
+
 
 const processWords = (wordsArray : string[]) => {
     const maxWords = 100;
@@ -77,11 +112,7 @@ const processWords = (wordsArray : string[]) => {
     return otherWords.concat(wordsUsedOnce);
 };
 
-    const words = processWords(storedWords);
-
-    console.log(words.length);
-
-    const updateWordcloudSize = () => {
+const updateWordcloudSize = (words: any) => {
         if (wordcloud.value) {
             if (!wordcloudInitialized) {
                 const theWordcloud = WordCloud(words, {
@@ -103,9 +134,6 @@ const processWords = (wordsArray : string[]) => {
         }
     };
 
-    window.addEventListener('resize', updateWordcloudSize);
-    updateWordcloudSize();
-});
 
 
 interface WordCloudOptions {
