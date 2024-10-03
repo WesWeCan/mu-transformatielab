@@ -10,7 +10,7 @@ const video_container = ref<HTMLDivElement | null>(null);
 const div_process = ref<HTMLDivElement | null>(null);
 const div_render = ref<HTMLDivElement | null>(null);
 
-const emit = defineEmits(['newSlice', "updateList"]);
+const emit = defineEmits(['cancelStep', 'continueStep']);
 
 const loadingText = ref('Loading...');
 
@@ -20,14 +20,32 @@ const currentVideoDeviceId = ref<string | undefined>(undefined);
 
 const preview = ref<HTMLDivElement | null>(null);
 
+const props = defineProps<{
+    language: string,
+    uuid: string
+}>();
+
+const isScanning = ref<boolean>(true);
+const processingPhoto = ref<boolean>(false);
+
+
+
 onMounted(async () => {
+    startScanning();
+});
+
+
+const startScanning = async () => {
     if (video_container.value && div_process.value && div_render.value) {
         await cp.init(video_container.value, div_process.value, div_render.value);
         availableVideoDevices.value = cp.availableVideoDevices;
         currentVideoDeviceId.value = cp.currentVideoDeviceId;
         requestAnimationFrame(loop);
     }
-});
+}
+
+
+
 
 /**
  * Main loop that runs the camera processor.
@@ -64,8 +82,9 @@ const imgPreview = ref<HTMLImageElement | null>(null);
 
 const takePhoto = async () => {
     console.log('take photo');
+    processingPhoto.value = true;
     dataUrl.value = await cp.takePhoto();
-
+    processingPhoto.value = false;
     console.log('dataUrl', dataUrl.value);
 
     if (dataUrl.value) {
@@ -77,6 +96,8 @@ const takePhoto = async () => {
             div_render.value?.appendChild(imgPreview.value);
         }
     }
+
+    isScanning.value = false;
 }
 
 const downloadImage = () => {
@@ -97,6 +118,23 @@ defineExpose({
 });
 
 
+const startOver = () => {
+    isScanning.value = true;
+}
+
+const continueStep = async () => {
+
+
+    // save image to storage
+
+
+    emit('continueStep');
+}
+
+const cancel = () => {
+    emit('cancelStep');
+}
+
 </script>
 
 
@@ -105,21 +143,29 @@ defineExpose({
     <div ref="div_process" class="div-process"></div>
 
 
-    <h1>Scanning</h1>
-    <div class="scanning">
-        
+    <h1>{{ language === 'dut' ? 'Scannen' : 'Scanning' }}</h1>
+    <span>{{ language === 'dut' ? 'Leg je ticket klaar en druk op scan ticket' : 'Please put your ticket and press scan ticket' }}</span>
+
+    <button @click="cancel">{{ language === 'dut' ? 'Annuleer' : 'Cancel' }}</button>
+   
+    <div class="scanning" :class="{ hidden: !isScanning, processing: processingPhoto }">
         <div ref="div_render" class="div-render">
         <span class="loading">{{ loadingText }}</span>
         </div>
     </div>
 
 
-    <button @click="takePhoto">Take Photo</button>
+    <button @click="takePhoto" :class="{ hidden: !isScanning }" :disabled="processingPhoto">{{ language === 'dut' ? 'Neem foto' : 'Take Photo' }}</button>
 
-    <div class="preview" ref="imgPreview">
+
+    <div class="preview" ref="imgPreview" :class="{ hidden: isScanning }">
         <img :src="dataUrl" alt="Preview">
 
-        <button>The image is readable!</button>
+        <button @click="continueStep">{{ language === 'dut' ? 'Foto is goed leesbaar, ga door' : 'The image is readable, go on' }}</button>
+
+        <br/>
+        <button @click="startOver">{{ language === 'dut' ? 'Maak nieuwe foto' : 'Take New Photo' }}</button>
     </div>
+
     
 </template>

@@ -1,5 +1,5 @@
 
-import { setupInferences } from './CameraProcessorFunctions/setup/setupInferences'
+
 import { getAvailableVideoDevices, getMediaStream, switchVideoDevice } from './CameraProcessorFunctions/setup/setupVideo'
 import { createCanvasses } from './CameraProcessorFunctions/setup/setupCanvasses'
 import { process } from './CameraProcessorFunctions/process/process';
@@ -111,7 +111,7 @@ export class CameraProcessor {
             return;
         }
 
-        await process(this, this.video);
+        await process(this);
         await this.draw();
         await this.render();
     }

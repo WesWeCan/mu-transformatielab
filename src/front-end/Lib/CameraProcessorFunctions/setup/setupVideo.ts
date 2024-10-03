@@ -2,7 +2,12 @@ import { CameraProcessor } from "../../CameraProcessor";
 
 
 
-const preferedDeviceLabel = "HD Pro Webcam C920";
+// const preferedDeviceLabel = "HD Pro Webcam C920";
+
+const preferedDeviceLabel = "IPEVO P2V ULTRA";
+
+
+
 
 /**
  * Get the available video devices.
@@ -180,7 +185,9 @@ export const getMediaStream = async (context: CameraProcessor, videoDiv: HTMLDiv
     if (videoDevice) {
         context.currentVideoDeviceId = videoDevice.deviceId;
     } else {
-        console.error('Preferred video device not found.');
+        console.warn('Preferred video device not found. Using default video device.');
+        
+        context.currentVideoDeviceId = 'default';
         return;
     }
 

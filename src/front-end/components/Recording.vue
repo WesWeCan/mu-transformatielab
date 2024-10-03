@@ -5,14 +5,20 @@ import { onMounted, ref } from 'vue';
 import { pipeline, env } from '@huggingface/transformers';
 env.allowLocalModels = false;
 
-let transcriber;
-
-const isEnglish = ref<boolean>(false);
+let transcriber : any;
 
 const loadingModel = ref<boolean>(false);
 
 const selectedWords = ref<string[]>([]);
 const availableWords = ref<string[]>([]);
+
+
+const props = defineProps<{
+    language: string,
+    uuid: string
+}>();
+
+const emit = defineEmits(['finish', 'cancel']);
 
 onMounted(async () => {
     console.log('Recording.vue mounted');
@@ -93,12 +99,14 @@ const transcribe = async () => {
     const start = performance.now();
 
     try {
-        transcribeOutput.value = await transcriber(url, {
-            language: isEnglish.value ? 'english' : 'dutch',
+        let tempOutput = await transcriber(url, {
+            language: props.language == 'dut' ? 'dutch' : 'english',
             task: 'transcribe',
             chunk_length_s: 30,
             stride_length_s: 5
         });
+
+        transcribeOutput.value = tempOutput.text;
     } catch (error) {
         console.error('Error during transcription:', error);
         transcribeOutput.value = 'Transcription failed.';
@@ -109,10 +117,10 @@ const transcribe = async () => {
 
     const end = performance.now();
 
-    console.log('transcribe', transcribeOutput.value.text);
+    console.log('transcribe', transcribeOutput.value);
 
     console.log('completed in', end - start, 'ms');
-    availableWords.value = transcribeOutput.value.text.trim().split(' ');
+    availableWords.value = transcribeOutput.value.trim().split(' ');
 
     // from each word remove all reading signs like , . ! etc
     // also make each word lowercase
@@ -146,6 +154,11 @@ const addCustomWord = () => {
 
 
 
+const finish = () => {
+    emit('finish');
+}
+
+
 </script>
 
 <template>
@@ -153,24 +166,22 @@ const addCustomWord = () => {
 
 <h1>Record your testimonial</h1>
     <div>Recording</div>
+    <button>{{ language === 'dut' ? 'Annuleer' : 'Cancel' }}</button>
 
-    <div class="language">
-        <button @click="isEnglish = true" :disabled="isEnglish">English</button>
-        <button @click="isEnglish = false" :disabled="!isEnglish">Dutch</button>
-    </div>
+    <span>{{ language === 'dut' ? 'Vat je gesprek samen in een korte testimonial, druk op opnemen' : 'Record your conversation in a short testimonial, press record' }}</span>
 
     <template v-if="loadingModel">
-        <div>Loading Model...</div>
+        <div>{{ language === 'dut' ? 'Model wordt geladen...' : 'Loading model...' }}</div>
     </template>
 
     <template v-else>
-        <button @click="startRecording" :disabled="isRecording">Start Recording in {{ isEnglish ? 'English' : 'Dutch' }}</button>
-        <button @click="stopRecording" :disabled="!isRecording">Stop Recording</button>
+        <button @click="startRecording" :disabled="isRecording">{{ language === 'dut' ? 'Opnemen' : 'Take Recording' }}</button>
+        <button @click="stopRecording" :disabled="!isRecording">{{ language === 'dut' ? 'Stop opnemen' : 'Stop Recording' }}</button>
 
         <audio ref="playback" controls hidden></audio>
 
         <div v-if="transcribing">
-            <div>Transcribing...</div>
+            <div>{{ language === 'dut' ? 'Transcriben...' : 'Transcribing...' }}</div>
         </div>
 
         <div v-else>
@@ -185,14 +196,20 @@ const addCustomWord = () => {
                 </button>
 
                 <br><br>
-                <span>Add Word</span>
+                <span>Add Word</span><br>
                 <input type="text" v-model="newWord" @keyup.enter="addCustomWord" />
+                <button @click="addCustomWord">{{ language === 'dut' ? 'Voeg woord toe' : 'Add Word' }}</button>
             </div>
 
             <div class="selected-words">
+                <span>{{ language === 'dut' ? 'Geselecteerde woorden' : 'Selected Words' }}</span><br>
                 <button v-for="word in selectedWords" :key="word" @click="toggleWordSelection(word)">
                     <span style="font-weight: bold">{{ word }}</span>
                 </button>
+
+
+                <br/><br/>
+                <button @click="finish">{{ language === 'dut' ? 'Klaar' : 'Done' }}</button>
             </div>
         </template>
 
