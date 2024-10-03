@@ -2,6 +2,7 @@
 // https://www.electronjs.org/docs/latest/tutorial/process-model#preload-scripts
 
 import { contextBridge, ipcRenderer } from 'electron';
+import { getWords } from './internal-processes/internal-storage';
 
 
 
@@ -18,6 +19,7 @@ declare global {
       storeTranscribe: (transcribeBase64: string, uuid: string) => void;
       storeTranscribed: (transcription: string, uuid: string) => void;
       storeWords: (words: string[], uuid: string) => void;
+      getWords: () => Promise<string[]>;
     };
   }
 }
@@ -59,4 +61,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
         return ipcRenderer.invoke('store-words', words, uuid);
     },
 
+    getWords: () => {
+      return ipcRenderer.invoke('get-words');
+    }
 });

@@ -154,7 +154,7 @@ const transcribe = async () => {
 
     for (let i = 0; i < availableWords.value.length; i++) {
         const word = availableWords.value[i];
-        availableWords.value[i] = word.replace(/[.,!?]/g, '').toLowerCase();
+        availableWords.value[i] = word.replace(/[;:.!?()\[\]{},"'’”\-—]+$/g, '').toLowerCase();
     }
 
 

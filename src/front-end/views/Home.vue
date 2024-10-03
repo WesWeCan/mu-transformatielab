@@ -7,8 +7,8 @@ import router from '../router';
 import { onMounted } from 'vue';
 
 onMounted(() => {
-    router.push('/testimonial');
-    // router.push('/wordcloud');
+    // router.push('/testimonial');
+    router.push('/wordcloud');
 });
 
 </script>

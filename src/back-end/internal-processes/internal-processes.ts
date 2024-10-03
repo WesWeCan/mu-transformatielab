@@ -2,7 +2,7 @@
 import { app, ipcMain } from 'electron';
 import { shell } from 'electron';
 
-import { storeTicketImg, storeTranscribe, storeTranscribed, storeWords } from './internal-storage';
+import { storeTicketImg, storeTranscribe, storeTranscribed, storeWords, getWords } from './internal-storage';
 
 export const registerInternalProcesses = async () => {
 
@@ -52,6 +52,14 @@ export const registerInternalProcesses = async () => {
         await storeWords(words, uuid);
 
         return;
+    });
+
+    ipcMain.handle('get-words', async (event) => {
+        console.log('get-words');
+
+        const words = await getWords();
+
+        return words;
     });
 
 }

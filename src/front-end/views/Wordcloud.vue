@@ -32,14 +32,21 @@ const colors = [
 ]
 
 
-onMounted(() => {
+onMounted(async () => {
     document.body.id = 'cloud';
     
-const processWords = (text : string) => {
+
+    let storedWords = await window.electronAPI.getWords();
+    // shuffle
+    storedWords = storedWords.sort(() => Math.random() - 0.5);
+    console.log(storedWords);
+
+const processWords = (wordsArray : string[]) => {
     const maxWords = 100;
 
     const wordCount = 
-        text.split(/[\s.]+/g)
+        wordsArray.join(' ')
+        .split(/[\s.]+/g)
         .map(w => w.replace(/^[“‘"\-—()\[\]{}]+/g, ""))
         .map(w => w.replace(/[;:.!?()\[\]{},"'’”\-—]+$/g, ""))
         .map(w => w.replace(/['’]s$/g, ""))
@@ -51,16 +58,16 @@ const processWords = (text : string) => {
             return acc;
         }, {});
 
-    let wordsArray = Object.keys(wordCount).map(d => ({
+    let wordsArrayProcessed = Object.keys(wordCount).map(d => ({
         text: d,
         size: Math.min(50, wordCount[d]) * 1,
         color: colors[Math.floor(Math.random() * colors.length)]
     }));
 
-    wordsArray = wordsArray.sort((a, b) => b.size - a.size).slice(0, maxWords);
+    wordsArrayProcessed = wordsArrayProcessed.sort((a, b) => b.size - a.size).slice(0, maxWords);
 
-    const wordsUsedOnce = wordsArray.filter(word => word.size === 1);
-    const otherWords = wordsArray.filter(word => word.size > 1);
+    const wordsUsedOnce = wordsArrayProcessed.filter(word => word.size === 1);
+    const otherWords = wordsArrayProcessed.filter(word => word.size > 1);
 
     for (let i = wordsUsedOnce.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
@@ -70,7 +77,7 @@ const processWords = (text : string) => {
     return otherWords.concat(wordsUsedOnce);
 };
 
-    const words = processWords(text);
+    const words = processWords(storedWords);
 
     console.log(words.length);
 
