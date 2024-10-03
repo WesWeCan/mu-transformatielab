@@ -15,6 +15,8 @@ const emit = defineEmits(['cancelStep', 'continueStep']);
 const loadingText = ref('Loading...');
 
 
+
+
 const availableVideoDevices = ref<{ device: InputDeviceInfo, capabilities: MediaTrackCapabilities }[]>([]);
 const currentVideoDeviceId = ref<string | undefined>(undefined);
 
@@ -100,14 +102,6 @@ const takePhoto = async () => {
     isScanning.value = false;
 }
 
-const downloadImage = () => {
-    cp.downloadImage();
-}
-
-const shareImage = () => {
-    cp.shareImage();
-}
-
 
 defineExpose({
     takePhoto,
@@ -125,8 +119,10 @@ const startOver = () => {
 const continueStep = async () => {
 
 
-    // save image to storage
+    const fixedDataUrl = dataUrl.value.replace('data:image/png;base64,', '');
 
+    // save image to storage
+    window.electronAPI.storeTicket(fixedDataUrl, props.uuid);
 
     emit('continueStep');
 }

@@ -11,7 +11,7 @@ const loadingModel = ref<boolean>(false);
 
 const selectedWords = ref<string[]>([]);
 const availableWords = ref<string[]>([]);
-
+const numTranscribed = ref<number>(0);
 
 const props = defineProps<{
     language: string,
@@ -21,6 +21,7 @@ const props = defineProps<{
 const emit = defineEmits(['finish', 'cancel']);
 
 onMounted(async () => {
+    numTranscribed.value = 0;
     console.log('Recording.vue mounted');
 
     loadingModel.value = true;
@@ -118,6 +119,32 @@ const transcribe = async () => {
     const end = performance.now();
 
     console.log('transcribe', transcribeOutput.value);
+    numTranscribed.value++;
+
+
+    // store transcribed
+    window.electronAPI.storeTranscribed(transcribeOutput.value, `${props.uuid}_${numTranscribed.value}`);
+
+    // Use the blob URL to create the file and store as mp3
+
+  
+    fetch(url)
+        .then(response => response.blob())
+        .then(blob => {
+            const reader = new FileReader();
+
+            reader.onloadend = () => {
+                const base64data = reader.result as string;
+                const audioDataUrl = base64data
+                    .replace(/^data:audio\/webm;base64,/, ''); // Maintain regex to match the new type
+
+                window.electronAPI.storeTranscribe(audioDataUrl, `${props.uuid}_${numTranscribed.value}`);
+            };
+
+            reader.readAsDataURL(blob);
+        })
+        .catch(error => console.error('Error converting to blob:', error));
+
 
     console.log('completed in', end - start, 'ms');
     availableWords.value = transcribeOutput.value.trim().split(' ');
@@ -155,6 +182,13 @@ const addCustomWord = () => {
 
 
 const finish = () => {
+
+    // store words
+    window.electronAPI.storeWords(JSON.parse(JSON.stringify(selectedWords.value)), props.uuid);
+
+
+
+
     emit('finish');
 }
 

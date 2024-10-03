@@ -14,6 +14,10 @@ declare global {
       onUpdateMenuCounter: (callback: (value: number) => void) => void;
       counterMenuValue: (value: number) => void;
       transcribe: (file: string, options: any) => Promise<string>;
+      storeTicket: (ticketBase64: string, uuid: string) => void;
+      storeTranscribe: (transcribeBase64: string, uuid: string) => void;
+      storeTranscribed: (transcription: string, uuid: string) => void;
+      storeWords: (words: string[], uuid: string) => void;
     };
   }
 }
@@ -39,5 +43,20 @@ contextBridge.exposeInMainWorld('electronAPI', {
     
 
 
+    storeTicket : (ticketBase64 : string, uuid : string) => {
+        return ipcRenderer.invoke('store-ticket', ticketBase64, uuid);
+    },
+
+    storeTranscribe : (transcribeBase64 : string, uuid : string) => {
+        return ipcRenderer.invoke('store-transcribe', transcribeBase64, uuid);
+    },
+
+    storeTranscribed : (transcription : string, uuid : string) => {
+        return ipcRenderer.invoke('store-transcribed', transcription, uuid);
+    },
+
+    storeWords : (words : string[], uuid : string) => {
+        return ipcRenderer.invoke('store-words', words, uuid);
+    },
 
 });

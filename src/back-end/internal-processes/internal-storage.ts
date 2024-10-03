@@ -10,8 +10,8 @@ const schema = [
         
     },
     {
-        folder: "tickets",
-         filename: "tickets.json",
+        folder: "words",
+         filename: "words.json",
          defaultValue: [] as any[],
          
      },
@@ -128,39 +128,93 @@ export const setTestimonials = async (testimonials: any) => {
     await fs.writeFileSync(getInternalStorageFilePath(path.join('testimonials', 'testimonials.json')), testimonialsString);
 }
 
-export const getTickets = async () => {
-    const tickets = await getInternalStorageFile(path.join('tickets', 'tickets.json'));
-    return JSON.parse(tickets.toString());
+export const getWords = async () => {
+    const words = await getInternalStorageFile(path.join('words', 'words.json'));
+    return JSON.parse(words.toString());
 }
 
 export const getTicketByID = async (ticketID: string) => {
-    const tickets = await getTickets();
-    const ticket = tickets.find((ticket: any) => ticket.ticketID === ticketID);
+    const words = await getWords();
+    const ticket = words.find((ticket: any) => ticket.ticketID === ticketID);
     return ticket;
 }
 
 export const appendTicket = async (ticket: any) => {
-    const tickets = await getTickets();
+    const words = await getWords();
 
-    const ticketExists = tickets.find((item: any) => item.ticketID === ticket.ticketID);
+    const ticketExists = words.find((item: any) => item.ticketID === ticket.ticketID);
 
     if (ticketExists) {
         console.log('Ticket exists, replacing');
 
-        const index = tickets.indexOf(ticketExists);
-        tickets[index] = ticket;
+        const index = words.indexOf(ticketExists);
+        words[index] = ticket;
 
-        await setTickets(tickets);
+        await setWords(words);
 
         return;
     }
 
-    tickets.push(ticket);
+    words.push(ticket);
 
-    await setTickets(tickets);
+    await setWords(words);
 }
 
-export const setTickets = async (tickets: any) => {
-    const ticketsString = JSON.stringify(tickets);
-    await fs.writeFileSync(getInternalStorageFilePath(path.join('tickets', 'tickets.json')), ticketsString);
+export const setWords = async (words: any) => {
+    const wordsString = JSON.stringify(words);
+    await fs.writeFileSync(getInternalStorageFilePath(path.join('words', 'words.json')), wordsString);
+}
+
+
+export const storeTicketImg = async (ticketBase64: string, uuid: string) => {
+
+    // store the ticketimage as <uuid>.png in the 'testimonials' folder
+    const filePath = path.join(getInternalStoragePath(), 'testimonials', `${uuid}.png`);
+    fs.writeFileSync(filePath, Buffer.from(ticketBase64, 'base64'));
+
+    console.log('Ticket image stored at', filePath);
+
+}
+
+
+export const storeTranscribe = async (transcribeBase64: string, uuid: string) => {
+
+    // store the transcribe as <uuid>.mp3 in the 'testimonials' folder
+    const filePath = path.join(getInternalStoragePath(), 'testimonials', `${uuid}.webm`);
+    fs.writeFileSync(filePath, Buffer.from(transcribeBase64, 'base64'));
+
+    console.log('Transcribe stored at', filePath);
+
+}
+
+export const storeTranscribed = async (transcription: string, uuid: string) => {
+
+    // store the transcribe as <uuid>.txt in the 'testimonials' folder
+    const filePath = path.join(getInternalStoragePath(), 'testimonials', `${uuid}_transcribed.txt`);
+    fs.writeFileSync(filePath, transcription);
+
+    console.log('Transcribe stored at', filePath);
+
+}
+
+
+
+
+
+export const storeWords = async (words: string[], uuid: string) => {
+    const filePath = path.join(getInternalStoragePath(), 'testimonials', `${uuid}_words.txt`);
+    fs.writeFileSync(filePath, words.join('\n'));
+
+
+    // get the words from the file in words.json
+    const wordsFromFile = await getWords();
+
+    // append the new words to the existing words in words.json
+    wordsFromFile.push(...words);
+
+    // store the new words in words.json
+    await setWords(wordsFromFile);
+
+    console.log('Words stored at', filePath);
+
 }
