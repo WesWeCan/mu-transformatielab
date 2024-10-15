@@ -12,6 +12,12 @@
   font-weight: bold;
 }
 
+@font-face {
+  font-family: "DMSans-Variable";
+  src: url('./fonts/DMSans-VariableFont_opsz,wght.ttf') format('truetype');
+  font-weight: normal;
+}
+
 
 $pleasantly-pink: #BF8097;
 $outstanding-orange: #9A2400;
@@ -31,7 +37,7 @@ body {
     //   Arial, sans-serif;
     font-family: 'DM Sans', sans-serif;
     margin: auto;
-    max-width: 38rem;
+    max-width: 45rem;
     padding: 2rem;
 
     &#cloud {
@@ -43,16 +49,26 @@ body {
 
     &#testimonial {
         
-
+        font-family: "DMSans-Variable";
         background-color: $pink;
-        color: $white;
+        color: $purple;
     }
 }
+
+
+
 h1 {
-    font-size: 2rem;
-    margin-bottom: 1rem;
+  font-size: 4em;
+}
+
+h1, h2, h3, h4, h5, h6, button {
+
     text-align: left;
-    font-family: 'CriteriaCF';
+    font-family: 'PPNeueBit';
+    font-weight: bolder;
+    text-transform: uppercase;
+    color: $purple;
+    margin: 0;
    
 }
 
@@ -191,4 +207,114 @@ video {
     position: fixed;
     top: 100%;
     left: 100%;
+}
+
+
+
+.buttons {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
+}
+
+button {
+  
+  font-size: 2em;
+  padding: 2rem;
+  background-color: transparent;
+  border: 2px solid $purple;
+  border-radius: 8px;
+
+  &:hover {
+    background-color: $purple;
+    color: $pink;
+    cursor: pointer;
+  }
+
+}
+
+
+input[type="text"] {
+
+  font-family: "PPNeueBit";
+  font-weight: bold;
+    font-size: 1.5em;
+    padding: 1rem;
+    background-color: transparent;
+    border: 2px solid $purple;
+    border-radius: 8px;
+    color: $purple;
+    width: 100%;
+
+
+    &:focus {
+      outline: none;
+      border: 2px solid $purple;
+    }
+}
+
+.word-input {
+  display: flex;
+  flex-direction: row;
+  gap: 1rem;
+
+  button {
+    padding: .5rem;
+    white-space: nowrap;
+  }
+}
+
+.scanning-container, .recording-container {
+ 
+
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+
+.scanning, .scanning-preview-img {
+  overflow: hidden;
+  border: 2px solid $purple;
+  border-radius: 8px;
+}
+
+.preview {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+
+.words {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.words .buttons {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+  gap: .5rem;
+
+  button {
+    padding: .65rem;
+   
+  }
+
+  button.selected {
+    background-color: $purple;
+    color: $pink;
+   &:hover {
+     background-color: $pink;
+     color: $purple;
+   }    
+
+  }
+}
+
+hr {
+  border: 1px solid $purple;
+  width: 100%;
 }

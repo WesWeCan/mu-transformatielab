@@ -5,6 +5,9 @@ import Recording from '../components/Recording.vue';
 
 import Scanning from '../components/Scanning.vue';
 
+// @ts-ignore
+import MU_DTL_Zwart from '../assets/MU_DTL_Zwart.svg';
+
 const language = ref<string>('eng');
 
 const currentStep = ref<number>(0);
@@ -16,7 +19,11 @@ onMounted(() => {
 });
 
 
-const start = () => {
+const start = (lang: string) => {
+
+    language.value = lang;
+
+
     currentStep.value = 1;
     currentUuid.value = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
 }
@@ -45,27 +52,21 @@ const finish = () => {
 
 <template>
 
-    <pre>{{ currentStep }} -- {{ currentUuid }}</pre>
+    <!-- <pre>{{ currentStep }} -- {{ currentUuid }}</pre> -->
+
+  
 
     <div class="intro" v-if="currentStep === 0">
 
-        <h2>Kies je taal / Choose your language</h2>
-        <button @click="language = 'dut'">Dutch</button>
-        <button @click="language = 'eng'">English</button>
 
+        <img :src="MU_DTL_Zwart" alt="MU DTL Zwart" class="mudtlzwart">
 
-        <template v-if="language === 'dut'">
-            <h1>Neem je testimonial op</h1>
-            <p>Je hebt door de dilemma's gelopen. Het is nu tijd om je testimonial op te nemen.</p>
-            
-        </template>
-       
-        <template v-else>
-            <h1>Take your testimonial</h1>
-            <p>You have been through the dilemmas. It is now time to take your testimonial.</p>
-        </template>
-
-        <button @click="start">Start</button>
+        <h1>Kies je taal /<br/> Choose your language</h1>
+        <br/>
+        <div class="buttons">
+        <button @click="start('dut')">Dutch</button>
+        <button @click="start('eng')">English</button>
+        </div>
         
     </div>
 
@@ -81,11 +82,11 @@ const finish = () => {
     <template v-if="currentStep === 3">
         <template v-if="language === 'dut'">
             <h1>Bedankt voor je testimonial</h1>
-            <p>Je testimonial is opgeslagen. Je kunt dit venster nu sluiten.</p>
+            <h2>Je testimonial wordt nu opgeslagen... </h2>
         </template>
         <template v-else>
             <h1>Thank you for your testimonial</h1>
-            <p>Your testimonial has been saved. You can now close this window.</p>
+            <h2>Your testimonial is been saved...</h2>
         </template>
     </template>
 

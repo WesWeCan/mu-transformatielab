@@ -171,11 +171,13 @@ const toggleWordSelection = (word: string) => {
 
 const newWord = ref<string>('');
 const addCustomWord = () => {
-    if (newWord.value.trim().length === 0) {
+    const word = newWord.value.trim().replace(/[;:.!?()\[\]{},"'’”\-—]+$/g, '').toLowerCase();
+
+    if (word.length === 0) {
         return;
     }
 
-    toggleWordSelection(newWord.value);
+    toggleWordSelection(word);
     newWord.value = '';
 }
 
@@ -198,56 +200,86 @@ const finish = () => {
 <template>
 
 
-<h1>Record your testimonial</h1>
-    <div>Recording</div>
-    <button>{{ language === 'dut' ? 'Annuleer' : 'Cancel' }}</button>
+<div class="recording-container">
 
-    <span>{{ language === 'dut' ? 'Vat je gesprek samen in een korte testimonial, druk op opnemen' : 'Record your conversation in a short testimonial, press record' }}</span>
+    <div>
+<h1>{{ language === 'dut' ? 'Neem je testimonial op' : 'Record your testimonial' }}</h1>
+    <h2>{{ language === 'dut' ? 'Vat je gesprek samen in een korte testimonial, druk op de knop' : 'Record your conversation in a short testimonial, press the button' }}</h2>
+
+    
+    </div>
+
 
     <template v-if="loadingModel">
-        <div>{{ language === 'dut' ? 'Model wordt geladen...' : 'Loading model...' }}</div>
+        <h2>{{ language === 'dut' ? 'Model wordt geladen...' : 'Loading model...' }}</h2>
     </template>
 
     <template v-else>
-        <button @click="startRecording" :disabled="isRecording">{{ language === 'dut' ? 'Opnemen' : 'Take Recording' }}</button>
-        <button @click="stopRecording" :disabled="!isRecording">{{ language === 'dut' ? 'Stop opnemen' : 'Stop Recording' }}</button>
 
+        <div class="while-recording" v-if="isRecording">
+            <h2>{{ language === 'dut' ? 'Opnemen...' : 'Recording...' }}</h2>
+        </div>
+
+
+        <div class="buttons" v-if="transcribeOutput.length == 0 && !transcribing">
+            <!-- <button>{{ language === 'dut' ? 'Annuleer' : 'Cancel' }}</button> -->
+        <button @click="startRecording" :disabled="isRecording" v-if="!isRecording">{{ language === 'dut' ? 'Start opnemen in het Nederlands' : 'Start Recording in English' }}</button>
+        <button @click="stopRecording" :disabled="!isRecording" v-if="isRecording">{{ language === 'dut' ? 'Stop opnemen' : 'Stop Recording' }}</button>
+        </div>
         <audio ref="playback" controls hidden></audio>
 
+
+
+
         <div v-if="transcribing">
-            <div>{{ language === 'dut' ? 'Transcriben...' : 'Transcribing...' }}</div>
+            <h2>{{ language === 'dut' ? 'Transcriben...' : 'Transcribing...' }}</h2>
         </div>
 
-        <div v-else>
+        <!-- <div v-else>
             {{ transcribeOutput }}
-        </div>
+        </div> -->
 
         <template v-if="availableWords.length">
+
+            <h2>{{ language === 'dut' ? 'Selecteer de woorden die je wilt opnemen in de woordwolk...' : 'Select the words you want to include in the wordcloud...' }}</h2>
             <div class="words">
-                <button v-for="word in availableWords" :key="word" @click="toggleWordSelection(word)">
-                    <span v-if="selectedWords.includes(word)" style="font-weight: bold">{{ word }}</span>
+
+                <div class="buttons">
+                <button v-for="word in availableWords" :key="word" @click="toggleWordSelection(word)"
+                :class="{'selected' : selectedWords.includes(word)}"
+                >
+                    <span class="selected" v-if="selectedWords.includes(word)" style="font-weight: bold">{{ word }}</span>
                     <span v-else>{{ word }}</span>
                 </button>
+                </div>
 
-                <br><br>
-                <span>Add Word</span><br>
+                <h2>{{ language === 'dut' ? '... Of voeg je eigen woorden toe:' : '... Or add your own words:' }}</h2>
+      
+                <div class="word-input">
                 <input type="text" v-model="newWord" @keyup.enter="addCustomWord" />
                 <button @click="addCustomWord">{{ language === 'dut' ? 'Voeg woord toe' : 'Add Word' }}</button>
             </div>
+            </div>
 
-            <div class="selected-words">
-                <span>{{ language === 'dut' ? 'Geselecteerde woorden' : 'Selected Words' }}</span><br>
-                <button v-for="word in selectedWords" :key="word" @click="toggleWordSelection(word)">
+            <div class="selected-words words">
+
+                <hr>
+                <h2>{{ language === 'dut' ? 'Geselecteerde woorden. Klik om te verwijderen.' : 'Selected Words. Click to remove.' }}</h2>
+
+                <div class="buttons">
+                <button class="selected" v-for="word in selectedWords" :key="word" @click="toggleWordSelection(word)">
                     <span style="font-weight: bold">{{ word }}</span>
                 </button>
+            </div>
 
-
-                <br/><br/>
-                <button @click="finish">{{ language === 'dut' ? 'Klaar' : 'Done' }}</button>
+            <br/>
+            <div class="buttons">
+                <button @click="finish">{{ language === 'dut' ? 'Klaar, voeg mijn woorden toe aan de cloud' : 'Done, add my words to the cloud' }}</button>
+            </div>
             </div>
         </template>
 
     </template>
 
-
+</div>
 </template>

@@ -139,10 +139,12 @@ const cancel = () => {
     <div ref="div_process" class="div-process"></div>
 
 
+    <div class="scanning-container">
+        <div>
     <h1>{{ language === 'dut' ? 'Scannen' : 'Scanning' }}</h1>
-    <span>{{ language === 'dut' ? 'Leg je ticket klaar en druk op scan ticket' : 'Please put your ticket and press scan ticket' }}</span>
-
-    <button @click="cancel">{{ language === 'dut' ? 'Annuleer' : 'Cancel' }}</button>
+    <h2>{{ language === 'dut' ? 'Leg je ticket klaar en druk op scan ticket' : 'Please put your ticket and press scan ticket' }}</h2>
+</div>
+    
    
     <div class="scanning" :class="{ hidden: !isScanning, processing: processingPhoto }">
         <div ref="div_render" class="div-render">
@@ -151,17 +153,22 @@ const cancel = () => {
     </div>
 
 
-    <button @click="takePhoto" :class="{ hidden: !isScanning }" :disabled="processingPhoto">{{ language === 'dut' ? 'Neem foto' : 'Take Photo' }}</button>
-
-
-    <div class="preview" ref="imgPreview" :class="{ hidden: isScanning }">
-        <img :src="dataUrl" alt="Preview">
-
-        <button @click="continueStep">{{ language === 'dut' ? 'Foto is goed leesbaar, ga door' : 'The image is readable, go on' }}</button>
-
-        <br/>
-        <button @click="startOver">{{ language === 'dut' ? 'Maak nieuwe foto' : 'Take New Photo' }}</button>
+    <div class="buttons" :class="{ hidden: !isScanning }"> 
+        <button @click="cancel" :class="{ hidden: !isScanning }">{{ language === 'dut' ? 'Annuleer' : 'Cancel' }}</button>
+        <button @click="takePhoto" :class="{ hidden: !isScanning }" :disabled="processingPhoto">{{ language === 'dut' ? 'Neem foto' : 'Take Photo' }}</button>
     </div>
 
-    
+    <div class="preview" ref="imgPreview" :class="{ hidden: isScanning }">
+        <img :src="dataUrl" alt="Preview" class="scanning-preview-img">
+
+        <div class="buttons">
+       
+            <button @click="startOver">{{ language === 'dut' ? 'Maak nieuwe foto' : 'Take New Photo' }}</button>
+            <button @click="continueStep">{{ language === 'dut' ? 'Doorgaan' : 'Continue' }}</button>
+       
+        
+        </div>
+    </div>
+
+</div>
 </template>
