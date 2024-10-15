@@ -6,11 +6,21 @@
     font-weight: bold;
 }
 
+@font-face {
+  font-family: 'PPNeueBit';
+  src: url('./fonts/PPNeueBit-Bold.otf') format('opentype');
+  font-weight: bold;
+}
+
 
 $pleasantly-pink: #BF8097;
 $outstanding-orange: #9A2400;
 $matured-maroon: #38001E;
 $progressive-pistachio: #6E7D68;
+
+$purple: #4d1630;
+$pink: #f9cecf;
+
 $black: #0D0D0D;
 $white: #FFFFFF;
 $success: #2EC786;
@@ -28,13 +38,13 @@ body {
         max-width: unset;
         padding: unset;
 
-        background-color: $outstanding-orange;
+        background-color: $purple
     }
 
     &#testimonial {
         
 
-        background-color: $progressive-pistachio;
+        background-color: $pink;
         color: $white;
     }
 }
@@ -124,16 +134,25 @@ video {
 
 @keyframes growAndShrink {
   0% {
-      scale: 1;
+      scale: 1.2;
       opacity: 0;
+      // rotate: -22deg;
+  }
+  25%{
+    opacity: 1;
   }
   50% {
-      scale: 1.1;
+      scale: 1;
       opacity: 1;
+      // rotate: 0deg;
+  }
+  75% {
+    opacity: 0;
   }
   100% {
-      scale: 1;
+      scale: 0.3;
       opacity: 0;
+      // rotate: 22deg;
   }
 }
 
@@ -143,9 +162,25 @@ video {
 }
 
 #text {
+
+  // font-family: "PPNeueBit", sans-serif;
+  // color: $pink;
+  text-shadow: 0 0 10px $purple;
   opacity: 0;
-  // transform-origin: center;
-  animation: growAndShrink 25s ease-in-out infinite;
+  font-weight: bold;
+  transform-origin: center;
+  animation: growAndShrink 15s linear infinite;
+}
+
+
+.wordcloud {
+  transition: opacity .50s ease;
+  
+  opacity: 1;
+
+  &.hidden {
+    opacity: 0;
+  }
 }
 
 

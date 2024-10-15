@@ -47,8 +47,8 @@ const createWindow = () => {
     cloudWindow.loadURL(MAIN_WINDOW_VITE_DEV_SERVER_URL);
 
     // Open the DevTools.
-    // mainWindow.webContents.openDevTools();
-    // cloudWindow.webContents.openDevTools();
+    mainWindow.webContents.openDevTools();
+    cloudWindow.webContents.openDevTools();
 
     // openInternalStorageFolder();
   } else {
@@ -82,11 +82,11 @@ const createWindow = () => {
  
    setTimeout(() => {
 
-    mainWindow.setFullScreen(true);
-    mainWindow.maximize();
+  //   mainWindow.setFullScreen(true);
+  //   mainWindow.maximize();
  
-     cloudWindow.setFullScreen(true);
-   cloudWindow.maximize();
+  //    cloudWindow.setFullScreen(true);
+  //  cloudWindow.maximize();
      
    }, 1000);
    // Enter fullscreen mode (green dot)

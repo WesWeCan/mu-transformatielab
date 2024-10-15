@@ -11,6 +11,7 @@ import { text, stopwords } from '../assets/data';
 const wordcloud = ref<HTMLElement | null>(null);
 let wordcloudInitialized = false;
 
+const wordcloudHidden = ref(false);
 
 
 const DENColor = {
@@ -21,14 +22,14 @@ const DENColor = {
     black: "#0D0D0D",
     white: "#FFFFFF",
     success: "#2EC786",
-    error: "#FF3B53"
+    error: "#FF3B53",
+    purple: "#4d1630",
+    pink: "#f9cecf"
 };
 
 const colors = [
-    DENColor.progressivePistachio,
-    DENColor.maturedMaroon,
-    DENColor.black,
-    DENColor.white
+    DENColor.pink,
+
 ]
 
 
@@ -37,12 +38,16 @@ let resizeListener : any;
 onMounted(async () => {
     document.body.id = 'cloud';
     
-
-    window.electronAPI.onUpdateCloud(() => {
-        initCloud();
+    window.electronAPI.onUpdateCloud(async () => {
+         initCloud();
     });
 
-    initCloud();
+     initCloud();
+
+    setTimeout(() => {
+        initCloud();
+    }, 1000);
+
 
 });
 
@@ -51,7 +56,7 @@ const initCloud = async () => {
 
     // empty the cloud
     wordcloudInitialized = false;
-    wordcloud.value.innerHTML = '';
+    
 
 
     let storedWords = await window.electronAPI.getWords();
@@ -71,13 +76,16 @@ const initCloud = async () => {
     }
 
     resizeListener = window.addEventListener('resize', updateWordcloudSize);
+    wordcloud.value.innerHTML = '';
     updateWordcloudSize(words);
 
 }
 
 
 const processWords = (wordsArray : string[]) => {
-    const maxWords = 100;
+    const maxWords = 200;
+    const minSize = 75;
+
 
     const wordCount = 
         wordsArray.join(' ')
@@ -95,7 +103,7 @@ const processWords = (wordsArray : string[]) => {
 
     let wordsArrayProcessed = Object.keys(wordCount).map(d => ({
         text: d,
-        size: Math.min(50, wordCount[d]) * 1,
+        size: Math.min(minSize, wordCount[d]*1.3) * (1.1 + Math.random() * 0.4),
         color: colors[Math.floor(Math.random() * colors.length)]
     }));
 
@@ -159,17 +167,17 @@ function WordCloud(text: { text: string, size: number }[], options: WordCloudOpt
     const {
         size = (d: any) => d.size,
         word = (d: any) => d.text,
-        marginTop = 10,
-        marginRight = 10,
-        marginBottom = 10,
-        marginLeft = 10,
+        marginTop = 8,
+        marginRight = 8,
+        marginBottom = 8,
+        marginLeft = 8,
         width = 0,
         height = 0,
         maxWords = -1,
-        fontFamily = "CriteriaCF",
-        fontScale = 15,
+        fontFamily = "PPNeueBit",
+        fontScale = 20,
         fill = 'black',
-        padding = 2,
+        padding = 5,
         rotate = 0,
         invalidation
     } = options;
@@ -178,6 +186,7 @@ function WordCloud(text: { text: string, size: number }[], options: WordCloudOpt
     const words = text;
 
     const svg = d3.create("svg")
+        .attr("id", "wordcloudsvg")
         .attr("viewBox", [0, 0, width, height])
         .attr("width", width)
         .attr("height", height)
@@ -213,6 +222,6 @@ function WordCloud(text: { text: string, size: number }[], options: WordCloudOpt
 </script>
 
 <template>
-  <div id="wordcloud" ref="wordcloud"></div>
+  <div id="wordcloud" ref="wordcloud" :class="{hidden : wordcloudHidden}"></div>
 </template>
 
