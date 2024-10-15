@@ -4,7 +4,9 @@ import { CameraProcessor } from "../../CameraProcessor";
 
 // const preferedDeviceLabel = "HD Pro Webcam C920";
 
-const preferedDeviceLabel = "IPEVO P2V ULTRA";
+// const preferedDeviceLabel = "IPEVO P2V ULTRA";
+// const preferedDeviceLabel = "HD Pro Webcam C920";
+const preferedDeviceLabel = "CZUR Fancy";
 
 
 
