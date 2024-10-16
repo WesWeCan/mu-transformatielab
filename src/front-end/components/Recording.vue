@@ -75,7 +75,17 @@ const startRecording = async () => {
 
     recordedChunks.value = [];
 
-    const mediaStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    const preferedDeviceLabel = "Trust";
+
+    const devices = await navigator.mediaDevices.enumerateDevices();
+    const audioDevices = devices.filter(device => device.kind === 'audioinput');
+    const deviceToUse = audioDevices.find(device => device.label.includes(preferedDeviceLabel)) || audioDevices[0];
+    
+    const mediaStream = await navigator.mediaDevices.getUserMedia({ 
+        audio: { deviceId: deviceToUse ? deviceToUse.deviceId : undefined }
+    });
+
+    console.log("selected device", deviceToUse);
 
     recorder.value = new MediaRecorder(mediaStream);
 
