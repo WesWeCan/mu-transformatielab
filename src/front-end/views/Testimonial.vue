@@ -10,7 +10,7 @@ import MU_DTL_Zwart from '../assets/MU_DTL_Zwart.svg';
 
 const language = ref<string>('eng');
 
-const currentStep = ref<number>(0);
+const currentStep = ref<number>(2);
 
 const currentUuid = ref<string>('<UNSET>');
 

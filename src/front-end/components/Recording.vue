@@ -3,7 +3,12 @@
 import { onMounted, ref } from 'vue';
 
 import { pipeline, env } from '@huggingface/transformers';
-env.allowLocalModels = false;
+env.allowLocalModels = true;
+env.allowRemoteModels = false;
+// env.useBrowserCache = false;
+
+
+// env.backends.onnx.wasm.wasmPaths = wasmFile;
 
 let transcriber : any;
 
@@ -24,7 +29,10 @@ onMounted(async () => {
     numTranscribed.value = 0;
     console.log('Recording.vue mounted');
 
-    loadingModel.value = true;
+    checkWasmInCache();
+    
+
+    loadingModel.value = true; 
     transcriber = await pipeline('automatic-speech-recognition', 'Xenova/whisper-base', {
         dtype: {
             encoder_model: 'fp32',
@@ -35,6 +43,27 @@ onMounted(async () => {
     loadingModel.value = false;
 
 })
+
+
+async function checkWasmInCache() {
+    if ('caches' in window) {
+        try {
+            const response = await fetch('https://cdn.jsdelivr.net/npm/@huggingface/transformers@3.0.0-alpha.19/dist/ort-wasm-simd-threaded.jsep.wasm', { cache: 'force-cache' });
+            if (response.ok) {
+                console.log('WASM file fetched from cache.');
+            } else {
+                console.log('WASM file not found in cache.');
+
+                alert("AI Model not cached, connect to internet first.")
+            }
+        } catch (error) {
+            console.log('Error fetching WASM file:', error);
+            alert("AI Model not cached, connect to internet first.")
+        }
+    }
+}
+
+
 
 const recorder = ref<MediaRecorder | null>(null);
 const playback = ref<HTMLAudioElement>(null);

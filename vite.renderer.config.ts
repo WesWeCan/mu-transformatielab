@@ -1,6 +1,7 @@
 import type { ConfigEnv, UserConfig } from 'vite';
 import { defineConfig } from 'vite';
 import { pluginExposeRenderer } from './vite.base.config';
+import wasm from 'vite-plugin-wasm';
 
 import vuePlugin from '@vitejs/plugin-vue';
 
@@ -20,6 +21,7 @@ export default defineConfig((env) => {
     plugins: [
       pluginExposeRenderer(name),
       vuePlugin(),
+      wasm(),
     ],
     resolve: {
       preserveSymlinks: true,
